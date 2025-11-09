@@ -4,7 +4,7 @@ debian-mingw-gcc-build:
   before_script:
     - |
       apt update
-      apt install -y cmake ninja-build g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
+      apt install -y git cmake ninja-build g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
   script:
     - |
       cmake -G Ninja \
