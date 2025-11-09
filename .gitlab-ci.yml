@@ -1,0 +1,29 @@
+debian-mingw-gcc-build:
+  stage: build
+  image: debian:trixie
+  before_script:
+    - |
+      apt update
+      apt install -y cmake ninja-build g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
+  script:
+    - |
+      cmake -G Ninja \
+      -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
+      -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
+      -DCMAKE_SYSTEM_NAME=Windows \
+      -DCMAKE_FIND_ROOT_PATH=/usr/x86_64-w64-mingw32 \
+      -DCMAKE_INSTALL_PREFIX=build/install -S . -B build
+    - cmake --build --target install
+  artifacts:
+    paths:
+      - build/install
+
+windows-mingw-gcc-test:
+  stage: test
+  tags:
+   - saas-windows-medium-amd64
+  script:
+    build/install/test.exe
+  needs:
+    - job: debian-mingw-gcc-build
+      artifacts: true
