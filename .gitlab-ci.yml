@@ -13,7 +13,7 @@ debian-mingw-gcc-build:
       -DCMAKE_SYSTEM_NAME=Windows \
       -DCMAKE_FIND_ROOT_PATH=/usr/x86_64-w64-mingw32 \
       -DCMAKE_INSTALL_PREFIX=build/install -S . -B build
-    - cmake --build --target install
+    - cmake --build build/ --target install
   artifacts:
     paths:
       - build/install
