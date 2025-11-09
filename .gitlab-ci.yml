@@ -23,7 +23,7 @@ windows-mingw-gcc-test:
   tags:
    - saas-windows-medium-amd64
   script:
-    build/install/test.exe
+    build/install/bin/test.exe
   needs:
     - job: debian-mingw-gcc-build
       artifacts: true
