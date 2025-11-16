@@ -39,6 +39,7 @@ jobs:
         uses: actions/download-artifact@v4
       - name: Execute tests
         run: |
+          cd build-artifacts
           dir
           $Env:PATH = "$PWD/python.3.13.0/tools;$Env:PATH"
           cd build/mingw-release/install
