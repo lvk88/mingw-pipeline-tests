@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:trixie
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
       - name: Install build tools
         run: |
           apt update
@@ -15,8 +17,6 @@ jobs:
           wget --no-check-certificate https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
           chmod +x nuget.exe
           mono nuget.exe install python -Version 3.13.0
-      - name: Checkout source code
-        uses: actions/checkout@v4
       - name: Execute build
         run: |
           ls -l
