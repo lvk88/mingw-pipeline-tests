@@ -2,28 +2,35 @@ debian-mingw-gcc-build:
   stage: build
   image: debian:trixie
   before_script:
-    - |
-      apt update
-      apt install -y git cmake ninja-build g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
+    - apt update
+    - apt install -y git cmake ninja-build g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 wget curl mono-devel
+    - wget --no-check-certificate https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+    - chmod +x nuget.exe
+    - mono nuget.exe install python -Version 3.13.0
   script:
-    - |
-      cmake -G Ninja \
-      -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
-      -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
-      -DCMAKE_SYSTEM_NAME=Windows \
-      -DCMAKE_FIND_ROOT_PATH=/usr/x86_64-w64-mingw32 \
-      -DCMAKE_INSTALL_PREFIX=build/install -S . -B build
-    - cmake --build build/ --target install
+    - cmake --preset mingw-release
+    - cmake --build --preset mingw-release --target install
   artifacts:
     paths:
-      - build/install
+      - build/mingw-release/install
+      - python.3.13.0
 
 windows-mingw-gcc-test:
   stage: test
   tags:
    - saas-windows-medium-amd64
   script:
-    build/install/bin/tests.exe
+    - build/install/bin/tests.exe
+    - $Env:PATH = "$PWD/python.3.13.0/tools;$Env:PATH"
+    - cd build/mingw-release/install
+    - python --version
+    - python -m venv venv
+    - venv/Scripts/activate
+    - pip install numpy pytest
+    - pytest --junitxml pytest_result.xml
   needs:
     - job: debian-mingw-gcc-build
       artifacts: true
+  artifacts:
+    reports:
+      junit: build/mingw-release/install/pytest_result.xml

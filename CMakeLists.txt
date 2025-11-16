@@ -47,7 +47,20 @@ install(TARGETS tests)
 # Add python module that uses the library
 pybind11_add_module(pylib pylib.cpp)
 target_link_libraries(pylib PUBLIC foo)
-install(TARGETS pylib LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS pylib LIBRARY DESTINATION pylib)
+
+# Add a __init__.py to the folder of pylib so that we can import it
+install(CODE "
+  FILE(WRITE \"${CMAKE_INSTALL_PREFIX}/pylib/__init__.py\" \"from .pylib import *\")
+  ")
+
+# Add also a conftest.py to the installation folder so that importing pylib works
+install(CODE "
+  FILE(WRITE \"${CMAKE_INSTALL_PREFIX}/conftest.py\" \"import pylib\")
+  ")
+
+# Install test_python.py so that we can run it 
+install(FILES test/test_python.py DESTINATION test)
 
 # Make sure that we copy the mingw dll-s to our output folder when installing
 if(MINGW)
@@ -60,6 +73,7 @@ if(MINGW)
         )
         if(EXISTS ${_MINGW_DLL_DEP_LOCATION})
             INSTALL(PROGRAMS ${_MINGW_DLL_DEP_LOCATION} TYPE BIN)
+            INSTALL(PROGRAMS ${_MINGW_DLL_DEP_LOCATION} DESTINATION pylib)
         endif(EXISTS ${_MINGW_DLL_DEP_LOCATION})
     endforeach()
 endif(MINGW)
