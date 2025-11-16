@@ -19,6 +19,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Execute build
         run: |
+          ls -l
+          pwd
+          ls -l mingw-pipeline-tests/
           cmake --preset mingw-release
           cmake --build --preset mingw-release --target install
       - name: Upload artifacts
