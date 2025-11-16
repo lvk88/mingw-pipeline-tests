@@ -20,9 +20,9 @@ windows-mingw-gcc-test:
   tags:
    - saas-windows-medium-amd64
   script:
-    - build/install/bin/tests.exe
     - $Env:PATH = "$PWD/python.3.13.0/tools;$Env:PATH"
     - cd build/mingw-release/install
+    - bin/tests.exe
     - python --version
     - python -m venv venv
     - venv/Scripts/activate
