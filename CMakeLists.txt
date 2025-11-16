@@ -33,17 +33,20 @@ if(CMAKE_CROSSCOMPILING)
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 endif(CMAKE_CROSSCOMPILING)
 
-# Add a DLL, a test for the DLL, and a python module that links to the DLL
+# Add a library  
 add_library(foo lib.cpp)
-add_executable(tests test.cpp)
-target_link_libraries(tests PRIVATE foo Catch2::Catch2WithMain)
+target_include_directories(foo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(foo PUBLIC cxx_std_20)
+install(TARGETS foo)
 
+# Test the library
+add_executable(tests test/test.cpp)
+target_link_libraries(tests PRIVATE foo Catch2::Catch2WithMain)
+install(TARGETS tests)
+
+# Add python module that uses the library
 pybind11_add_module(pylib pylib.cpp)
 target_link_libraries(pylib PUBLIC foo)
-
-# Install all these into one folder
-install(TARGETS tests)
-install(TARGETS foo)
 install(TARGETS pylib LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Make sure that we copy the mingw dll-s to our output folder when installing
