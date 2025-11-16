@@ -29,3 +29,22 @@ jobs:
           path: |
             build/mingw-release/install
             python.3.13.0
+  test:
+    name: "Run tests on Windows"
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+      - name: Execute tests
+        run: |
+          dir
+          $Env:PATH = "$PWD/python.3.13.0/tools;$Env:PATH"
+          cd build/mingw-release/install
+          bin/tests.exe
+          python --version
+          python -m venv venv
+          venv/Scripts/activate
+          pip install numpy pytest
+          pytest --junitxml pytest_result.xml
