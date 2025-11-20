@@ -64,7 +64,7 @@ install(FILES test/test_python.py DESTINATION test)
 
 # Make sure that we copy the mingw dll-s to our output folder when installing
 if(MINGW)
-    foreach(_MINGW_DLL_DEP IN ITEMS libgcc_s_seh-1.dll libgomp-1.dll libstdc++-6.dll libwinpthread-1.dll)
+    foreach(_MINGW_DLL_DEP IN ITEMS libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll)
         execute_process(
             COMMAND ${CMAKE_CXX_COMPILER}
             -print-file-name=${_MINGW_DLL_DEP}
