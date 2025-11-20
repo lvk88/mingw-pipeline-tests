@@ -79,7 +79,7 @@ cmake \
 
 We also want to explicitly avoid that CMake looks for libraries and includes on the host system, and `ONLY` looks for them in the `CMAKE_FIND_ROOT_PATH` we just specified:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -94,7 +94,7 @@ See documentation for [CMAKE_FIND_ROOT_PATH_MODE_INCLUDE](https://cmake.org/cmak
 
 Note that it easily leads to an error to specify `-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=ONLY`. When doing this, we instruct CMake to ignore the paths on the host system when looking for `PROGRAM`-s, including the build system. CMake would not find `Ninja` or `make` and exit with an error. In fact, what we want is to tell cmake the opposite: when looking for `PROGRAM`-s we `NEVER` want CMake to look in the root environment of our cross-setup:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -138,7 +138,7 @@ mono nuget.exe install python -Version 3.13.0
 
 This will download and install Python 3.13.0 in `$PWD/python.3.13.0`:
 
-```Diff
+```diff
  .
  ├── CMakeLists.txt
  ├── CMakePresets.json
@@ -169,7 +169,7 @@ This will download and install Python 3.13.0 in `$PWD/python.3.13.0`:
 
 Now that we have python, we add the path to it `CMAKE_FIND_ROOT_PATH`:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -201,7 +201,7 @@ Development.Module) (found suitable version "3.12.3", minimum required is
 
 The problem is that including `pybind11` will eventually call `find_package(Python)` (see [here](https://github.com/pybind/pybind11/blob/f5fbe867d2d26e4a0a9177a51f6e568868ad3dc8/tools/pybind11NewTools.cmake#L54)), which will execute CMake's built in [find_python](https://github.com/Kitware/CMake/blob/b196a40b0dd1c94ad2fa3cacfc445c8b60d71467/Modules/FindPython/Support.cmake), which gets confused about our cross compiling setup. It finds some parts of Python from the host (Linux), but it also understands that it needs to find Python from the target (Windows), and eventually it gives up. Therefore, we need to tell CMake to ONLY look in our `CMAKE_ROOT_PATH` when looking for python. To do that, before including pybind11, we set `CMAKE_FIND_ROOT_PATH_MODE_PROGRAM=ONLY`, and set it back to `NEVER` after `pybind11` has initialized itself:
 
-```Diff
+```diff
 FetchContent_Declare(
     pybind11
     GIT_REPOSITORY https://github.com/pybind/pybind11.git
@@ -220,7 +220,7 @@ FetchContent_MakeAvailable(pybind11)
 
 Running our cmake command again still results in failure. So we explicitly tell CMake where to look for the Python include dirs and the python library:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -236,7 +236,7 @@ cmake \
 
 This command still fails, because pybind11 also wants to find the interpreter, which turn into a `find_program` call, which will also try to execute the found interpreter, and it is not going to work out, because we are on Linux and we can't run the found Python interpeter that is a Windows executable. Fortunately, we can tell `pybind11` to NOT look for the interpeter by using `PYBIND11_USE_CROSSCOMPILING=ON`.
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -263,7 +263,7 @@ CMake Warning at build/_deps/pybind11-src/tools/pybind11GuessPythonExtSuffix.cma
 
 Of course, now pybind11 doesn't know what kind of ABI we are building against, because it can't ask the interpeter. So we do as it suggests:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -296,7 +296,7 @@ gmake: *** [Makefile:136: all] Error 2
 
 Even though we silenced the warning with `-DPYTHON_MODULE_EXT_SUFFIX="..."`, at the time we get to the [strip](https://github.com/pybind/pybind11/blob/f5fbe867d2d26e4a0a9177a51f6e568868ad3dc8/tools/pybind11Common.cmake#L445) step, CMake forgets about it. To get around this issue, we set yet another CMake variable:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
@@ -369,7 +369,7 @@ endif(MINGW)
 
 Because we are installing, we also need a CMake install prefix:
 
-```Diff
+```diff
 cmake \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
