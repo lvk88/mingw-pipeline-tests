@@ -4,6 +4,8 @@
 |--------|---------|
 | GitHub |[![build-and-test](https://github.com/lvk88/mingw-pipeline-tests/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/lvk88/mingw-pipeline-tests/actions/workflows/build-and-test.yml) |
 
+This repository contains an example for cross-compiling a Python extension module using pybind11 for Windows on a Debian machine.
+
 ## Quick start
 
 The steps below build the extension module in a Debian docker container.
@@ -136,7 +138,7 @@ mono nuget.exe install python -Version 3.13.0
 
 This will download and install Python 3.13.0 in `$PWD/python.3.13.0`:
 
-```
+```Diff
  .
  ├── CMakeLists.txt
  ├── CMakePresets.json
